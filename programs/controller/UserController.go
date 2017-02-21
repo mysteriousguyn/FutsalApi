@@ -11,73 +11,91 @@ package controller
 import (
 	"net/http"
 	"fmt"
-	"../service"
 	"github.com/gorilla/mux"
 
 	"io/ioutil"
 	"github.com/structure/futsalStruct"
 	"encoding/json"
+	"github.com/RandomGeneration"
 )
 
+//method to handle url for adding user information
 func AddUser(w http.ResponseWriter, r *http.Request) {
 
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 	var user futsalStruct.User
+
 	requestBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(requestBody, &user)        //decoding the request body to the structure
 
-	//decoding the request body
-	json.Unmarshal(requestBody, &user)
+	header := futsalStruct.Header{requestId, "UserManagement", "ADD"}
+	ParseToJson(header, "", user)
 
-	response := service.AddUser(user)
-
-	fmt.Fprint(w, response)
+	fmt.Fprint(w, EndResponse(requestId))
 }
 
+//method to handle url for retrieving all user information
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
-	response := service.GetUser()
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 
-	fmt.Fprint(w, response)
+	header := futsalStruct.Header{requestId, "UserManagement", "SELECT"}
+	ParseToJson(header, "", nil)
+
+	fmt.Fprint(w, EndResponse(requestId))
 }
 
+//method to handle url for retrieving user information of particular id
 func GetUserById(w http.ResponseWriter, r *http.Request) {
 
-	//getting the path variable from url
-	id := mux.Vars(r)["id"]
-	response := service.GetUserById(id)
+	id := mux.Vars(r)["id"]        //getting the path variable from url
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 
-	fmt.Fprint(w, response)
+	header := futsalStruct.Header{requestId, "UserManagement", "SELECT BY ID"}
+	ParseToJson(header, id, nil)
+
+	fmt.Fprint(w, EndResponse(requestId))
 }
 
+//method to handle url for updating user information of particular id
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
-	//getting the path variable from url
-	id := mux.Vars(r)["id"]
+	id := mux.Vars(r)["id"]        //getting the path variable from url
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 	var user futsalStruct.User
+
 	requestBody, _ := ioutil.ReadAll(r.Body)
-
 	json.Unmarshal(requestBody, &user)
-	response := service.UpdateUserById(id, user)
 
-	fmt.Fprint(w, response)
+	header := futsalStruct.Header{requestId, "UserManagement", "UPDATE"}
+	ParseToJson(header, id, user)
+
+	fmt.Fprint(w, EndResponse(requestId))
 }
 
+//method to handle url for deleting user information of particular id
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
-	id := mux.Vars(r)["id"]
-	response := service.DeleteUserById(id)
+	id := mux.Vars(r)["id"]      //getting the path variable from url
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 
-	fmt.Fprint(w, response)
+	header := futsalStruct.Header{requestId, "UserManagement", "DELETE"}
+	ParseToJson(header, id, nil)
+
+	fmt.Fprint(w, EndResponse(requestId))
 }
 
+//method to handle url for login and checking the corressponding email and password
 func Login(w http.ResponseWriter, r *http.Request) {
 
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 	var user futsalStruct.User
+
 	requestBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(requestBody, &user)        //decoding the request body to the structure
 
-	json.Unmarshal(requestBody, &user)
-	response := service.LoginUser(user)
-	fmt.Println("the response is=",response)
-	fmt.Fprint(w, response)
+	header := futsalStruct.Header{requestId, "UserManagement", "LOGIN"}
+	ParseToJson(header, "", user)
 
-
+	fmt.Fprint(w, EndResponse(requestId))
 }

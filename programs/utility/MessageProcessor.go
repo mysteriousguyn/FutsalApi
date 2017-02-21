@@ -37,12 +37,12 @@ func ProcessMessage(message string) {
 func ResNil() {
 	ns = map[string]interface{}{"Message":"Error"}
 	res.ResponseMessage = ns
+	res.ResponseRequestId=""
 }
 
 func SendMessage() *futsalStruct.Response {
 
 	if (res == nil) {
-		//ns:=map[string]interface{}{"Message":"Error"}
 
 		res = &futsalStruct.Response{"", "", "", ns}
 		return res

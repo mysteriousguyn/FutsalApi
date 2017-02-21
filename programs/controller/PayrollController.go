@@ -11,73 +11,98 @@ package controller
 import (
 	"net/http"
 	"fmt"
-	"../service"
 	"github.com/gorilla/mux"
 	"github.com/structure/futsalStruct"
 	"io/ioutil"
 	"encoding/json"
 	"strings"
+	"github.com/RandomGeneration"
 )
 
+//method to handle url for adding payroll detail information
 func AddPayroll(w http.ResponseWriter, r *http.Request) {
 
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 	var payroll futsalStruct.Payroll
+
 	requestBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(requestBody, &payroll)        //decoding the request body to the structure
 
-	//decoding the request body
-	json.Unmarshal(requestBody, &payroll)
+	header := futsalStruct.Header{requestId, "PayrollManagement", "ADD"}
+	ParseToJson(header, "", payroll)
 
-	response := service.AddPayrollInfo(payroll)
-
-	fmt.Fprintf(w, response)
-
+	fmt.Fprintf(w, EndResponse(requestId))
 }
 
+//method to handle url for retrieving all payroll detail information
 func GetPayroll(w http.ResponseWriter, r *http.Request) {
 
-	response := service.GetPayrollInfo()
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 
-	fmt.Fprintf(w, response)
+	header := futsalStruct.Header{requestId, "PayrollManagement", "SELECT"}
+	ParseToJson(header, "", nil)
 
+	fmt.Fprintf(w, EndResponse(requestId))
 }
 
+/*
+method to handle url for retrieving payroll detail information of particular id
+or user id
+*/
 func GetPayrollById(w http.ResponseWriter, r *http.Request) {
 
-	//getting the path variable from url
-	id := mux.Vars(r)["id"]
-	fmt.Println("The id of payroll is:=", id)
+	id := mux.Vars(r)["id"]        //getting the path variable from url
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
+	var header futsalStruct.Header
 
-	uriSegment := strings.Split(r.URL.Path, "/")
-	api := uriSegment[1]
-	fmt.Println(api)
-	response := service.GetPayrollInfoById(id, api)
+	uriSegment := strings.Split(r.URL.Path, "/")        //separates the uri on /
+	api := uriSegment[1]        //get the second substring after separation
 
-	fmt.Fprintf(w, response)
+	if (api == "payroll") {
+		header = futsalStruct.Header{requestId, "PayrollManagement", "SELECT BY ID"}
+	} else if (api == "payrollbyuserid") {
+		header = futsalStruct.Header{requestId, "PayrollManagement", "SELECT BY USERID"}
+	}
+	ParseToJson(header, id, nil)
 
+	fmt.Fprintf(w, EndResponse(requestId))
 }
 
+//method to handle url for updating payroll detail information of particular id
 func UpdatePayroll(w http.ResponseWriter, r *http.Request) {
 
-	//getting the path variable from url
-	id := mux.Vars(r)["id"]
-
+	id := mux.Vars(r)["id"]        //getting the path variable from url
+	requestId := RandomGeneration.GenerateRandom()        //generating the globally unique identifier
 	var payroll futsalStruct.Payroll
+
 	requestBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(requestBody, &payroll)        //decoding the request body to the structure
 
-	//decode the request body
-	json.Unmarshal(requestBody, &payroll)
-	response := service.UpdatePayroll(id, payroll)
+	header := futsalStruct.Header{requestId, "PayrollManagement", "UPDATE"}
+	ParseToJson(header, id, payroll)
 
-	fmt.Fprintf(w, response)
+	fmt.Fprintf(w, EndResponse(requestId))
 }
 
+/*
+method to handle url for deleting payroll detail information of particular id
+or user id
+*/
 func DeletePayroll(w http.ResponseWriter, r *http.Request) {
 
-	//getting the path variable from url
-	id := mux.Vars(r)["id"]
-	uriSegment := strings.Split(r.URL.Path, "/")
-	api := uriSegment[1]
-	response := service.DeletePayroll(id, api)
+	id := mux.Vars(r)["id"]        //getting the path variable from url
+	requestId := RandomGeneration.GenerateRandom()
+	var header futsalStruct.Header
 
-	fmt.Fprintf(w, response)
+	uriSegment := strings.Split(r.URL.Path, "/")        //separates the uri on "/"
+	api := uriSegment[1]        //get the second substring after separation
+
+	if (api == "deletepayroll") {
+		header = futsalStruct.Header{requestId, "PayrollManagement", "DELETE"}
+	} else if (api == "deletepayrollbyuserid") {
+		header = futsalStruct.Header{requestId, "PayrollManagement", "DELETE BY USERID"}
+	}
+	ParseToJson(header, id, nil)
+
+	fmt.Fprintf(w, EndResponse(requestId))
 }
