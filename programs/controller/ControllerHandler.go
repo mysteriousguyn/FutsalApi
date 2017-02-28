@@ -6,9 +6,9 @@ package controller
 import (
 	"encoding/json"
 	"github.com/structure/futsalStruct"
-	Mb"../messageBroker"
+	Mb"FutsalApi/programs/messageBroker"
 	"log"
-	"../utility"
+	"FutsalApi/programs/utility"
 )
 
 /*

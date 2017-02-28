@@ -7,85 +7,117 @@
 package test_test
 
 import (
-	"github.com/structure/futsalStruct"
-	"../programs/service"
-
+	"../programs/controller"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"encoding/json"
-	"fmt"
+	//"encoding/json"
+	"net/http"
+	//"fmt"
+	"net/http/httptest"
 )
 
-var _ = Describe("UserTest", func() {
-
-	var (
-		header futsalStruct.Header
-		user futsalStruct.User
-		jsonData string
-	)
-
+var _= Describe("Server",func(){
+	var recorder *httptest.ResponseRecorder
+	var request *http.Request
+	var handler http.HandlerFunc
 	BeforeEach(func() {
-		header=futsalStruct.Header{"Add User","ADD"}
-		user=futsalStruct.User{"1","Nilav","something@gmail.com","Tech","Khatiwada","password","9843241699"}
-
-		b,_:=json.Marshal(user)
-		jsonData=string(b)
+		recorder=httptest.NewRecorder()
 	})
 
-	Describe("Testing the User Activity", func() {
-		Context("Testing the User Signup",func() {
-
-			It("Should return successfully signed up",func() {
-				fmt.Println("There is something   ",jsonData)
-				Expect(service.AddUser(user)).To(Equal("Successfull"))
-			})
-
+	Describe("GET /user",func(){
+		BeforeEach(func() {
+			request, _ = http.NewRequest("GET", "/user", nil)
+			handler=http.HandlerFunc(controller.GetUser)
 		})
 
-		Context("Testing User Login",func() {
-
-			It("Should return successfully signed up",func() {
-				fmt.Println("There is something   ",jsonData)
-				Expect(service.LoginUser(user)).To(Equal("Successfully Logged In"))
+		Context("when no users exist", func() {
+			It("returns a status code of 200", func() {
+				handler.ServeHTTP(recorder,request)
+				Expect(recorder.Code).To(Equal(200))
 			})
 
-		})
-
-		Context("Getting User By User Id",func() {
-
-			It("Should return successfully signed up",func() {
-				fmt.Println("There is something   ",jsonData)
-				Expect(service.GetUserById(user.UserId)).To(Equal("Successfull"))
-			})
-
-		Context("Updating User",func() {
-
-			It("Should return successfully signed up",func() {
-				fmt.Println("There is something   ",jsonData)
-				Expect(service.UpdateUserById(user.UserId,user)).To(Equal("Successfull"))
-			})
-
-			})
-
-		Context("Deleting User",func() {
-
-			It("Should return successfully signed up",func() {
-				fmt.Println("There is something   ",jsonData)
-				Expect(service.DeleteUserById(user.UserId)).To(Equal("Successfull"))
-			})
-
+			It("returns a empty body", func() {
+				handler.ServeHTTP(recorder,request)
+				Expect(recorder.Body.String()).To(Equal("[]"))
 			})
 		})
+
+
 	})
 
-	Describe("Login", func() {
-		Context("Testing the User Login", func() {
-
-			It("Should return successfully logged in", func() {
-				fmt.Println("There is something   ", jsonData)
-				Expect(service.LoginUser(user)).To(Equal("Successfull"))
-			})
-
-		})
-	})
 })
+
+
+//var _ = Describe("UserTest", func() {
+//
+//	var (
+//		header futsalStruct.Header
+//		user futsalStruct.User
+//		jsonData string
+//	)
+//
+//	BeforeEach(func() {
+//		header=futsalStruct.Header{"Add User","ADD"}
+//		user=futsalStruct.User{"1","Nilav","something@gmail.com","Tech","Khatiwada","password","9843241699"}
+//
+//		b,_:=json.Marshal(user)
+//		jsonData=string(b)
+//	})
+//
+//	Describe("Testing the User Activity", func() {
+//		Context("Testing the User Signup",func() {
+//
+//			It("Should return successfully signed up",func() {
+//				fmt.Println("There is something   ",jsonData)
+//				Expect(service.AddUser(user)).To(Equal("Successfull"))
+//			})
+//
+//		})
+//
+//		Context("Testing User Login",func() {
+//
+//			It("Should return successfully signed up",func() {
+//				fmt.Println("There is something   ",jsonData)
+//				Expect(service.LoginUser(user)).To(Equal("Successfully Logged In"))
+//			})
+//
+//		})
+//
+//		Context("Getting User By User Id",func() {
+//
+//			It("Should return successfully signed up",func() {
+//				fmt.Println("There is something   ",jsonData)
+//				Expect(service.GetUserById(user.UserId)).To(Equal("Successfull"))
+//			})
+//
+//		Context("Updating User",func() {
+//
+//			It("Should return successfully signed up",func() {
+//				fmt.Println("There is something   ",jsonData)
+//				Expect(service.UpdateUserById(user.UserId,user)).To(Equal("Successfull"))
+//			})
+//
+//			})
+//
+//		Context("Deleting User",func() {
+//
+//			It("Should return successfully signed up",func() {
+//				fmt.Println("There is something   ",jsonData)
+//				Expect(service.DeleteUserById(user.UserId)).To(Equal("Successfull"))
+//			})
+//
+//			})
+//		})
+//	})
+//
+//	Describe("Login", func() {
+//		Context("Testing the User Login", func() {
+//
+//			It("Should return successfully logged in", func() {
+//				fmt.Println("There is something   ", jsonData)
+//				Expect(service.LoginUser(user)).To(Equal("Successfull"))
+//			})
+//
+//		})
+//	})
+//})

@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"../utility"
+	"FutsalApi/programs/utility"
 )
 
 var client Mqtt.Client
